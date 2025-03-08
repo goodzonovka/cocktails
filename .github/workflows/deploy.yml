@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Настройка SSH-ключа
+      - run: mkdir -p "$HOME/.ssh"
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > "$HOME/.ssh/key"
+      - run: chmod 600 "$HOME/.ssh/key"
+
+      # Установка зависимостей и билд
+      - run: npm ci
+      - run: npm run build
+
+      # Деплой через rsync
+      - run: rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . fg573435@fg573435.ftp.tools:/home/fg573435/goodzonovka.com/cocktails
+
+      # Запуск сервера в фоновом режиме
+      - run: |
+          ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no fg573435@fg573435.ftp.tools << 'EOF'
+          cd /home/fg573435/goodzonovka.com/cocktails
+          npm install
+          npm run build
+          nohup npx vite preview --port=3000 --host=127.1.4.138 > output.log 2>&1 &
+          EOF

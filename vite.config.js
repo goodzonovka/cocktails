@@ -15,4 +15,15 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    host: process.env.HOST || '127.0.0.1',
+    port: process.env.PORT ? Number(process.env.PORT) : 3000,
+    strictPort: true,
+    allowedHosts: ['cocktails.goodzonovka.com'],
+  },
+  preview: {
+    host: '127.0.0.1', // Обязательно указываем хост
+    port: 3000, // Используем порт 3000
+    strictPort: true,
+  }
 })

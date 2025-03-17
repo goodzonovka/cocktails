@@ -61,7 +61,7 @@ function goBack() {
 </template>
 
 <style lang="sass" scoped>
-@import "@/assets/styles/main.sass"
+@use "@/assets/styles/variables" as *
 
 .root
   display: flex
